@@ -235,5 +235,35 @@ public class UserService {
         return findUserById(userId).getEncheres();
     }
 
+    @Transactional
+    public String sellPokemonToSystem(Long userId, Long pokemonId) {
+        // Find the user
+        User user = findUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found.");
+        }
+
+        // Check if the user owns the Pokémon
+        Pokemon pokemonToSell = user.getPokemons().stream()
+                .filter(pokemon -> pokemon.getId().equals(pokemonId))
+                .findFirst()
+                .orElse(null);
+
+        if (pokemonToSell == null) {
+            throw new IllegalArgumentException("User does not own this Pokémon.");
+        }
+
+        int pokemonRealValue = pokemonToSell.getValeurReelle();
+
+        user.setLimCoins(user.getLimCoins() + pokemonRealValue);
+
+        user.getPokemons().remove(pokemonToSell);
+
+        em.merge(user);
+
+        return "Pokémon sold successfully! Real value: " + pokemonRealValue + " LimCoins.";
+    }
+
+
 
 }

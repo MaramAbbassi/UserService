@@ -1,40 +1,32 @@
 package com.example.user;
 
-import java.util.ArrayList;
+import jakarta.persistence.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Pokemon {
 
+
     private Long id;
-    private String name;
-    private List<String> abilities;
-    private List<String> evolution_chain;
-    private Map<String, String> stats;
-    private List<Enchere> History;
 
-    // Constructeur par défaut
-    public Pokemon() {
-        this.stats = Map.of(
-                "hp", "",
-                "attack", "",
-                "defense", "",
-                "special-attack", "",
-                "special-defense", "",
-                "speed", ""
-        );
-        this.History = new ArrayList<>();
+    private String nom;
+    private String description;
+    private int miseAPrix;
+    private int valeurReelle;
+    private List<String> types;
+    private Map<String, Integer> stats;
+    private Map<Long, Integer> historique_encheres = new HashMap<>(); // On stocke id_utilisateur et montant
+
+    public Pokemon() {}
+
+    public Pokemon(String nom, String description, int valeurReelle) {
+        this.nom = nom;
+        this.description = description;
+        this.valeurReelle = valeurReelle;
+        this.miseAPrix = (int) (valeurReelle * (0.6 + Math.random() * 0.8));
     }
 
-    // Constructeur avec paramètres
-    public Pokemon(Long id, String name, List<String> abilities, List<String> evolution_chain, Map<String, String> stats) {
-        this.id = id;
-        this.name = name;
-        this.abilities = abilities;
-        this.evolution_chain = evolution_chain;
-        this.stats = stats;
-        this.History=new ArrayList<>();
-    }
 
     // Getters et Setters
     public Long getId() {
@@ -45,42 +37,68 @@ public class Pokemon {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getNom() {
+        return nom;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
-    public List<String> getAbilities() {
-        return abilities;
+    public String getDescription() {
+        return description;
     }
 
-    public void setAbilities(List<String> abilities) {
-        this.abilities = abilities;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public List<String> getEvolution_chain() {
-        return evolution_chain;
+    public int getMiseAPrix() {
+        return miseAPrix;
     }
 
-    public void setEvolution_chain(List<String> evolution_chain) {
-        this.evolution_chain = evolution_chain;
+    public void setMiseAPrix(int miseAPrix) {
+        this.miseAPrix = miseAPrix;
     }
 
-    public Map<String, String> getStats() {
+    public int getValeurReelle() {
+        return valeurReelle;
+    }
+
+    public void setValeurReelle(int valeurReelle) {
+        this.valeurReelle = valeurReelle;
+    }
+
+    public Map<Long, Integer> getHistorique_encheres() {
+        return historique_encheres;
+    }
+
+    public void ajouterEnchere(Long utilisateurId, int montant) {
+        historique_encheres.put(utilisateurId, montant);
+    }
+
+    public void supprimerEnchere(Long utilisateurId) {
+        historique_encheres.remove(utilisateurId);
+    }
+
+    public Integer getMontantEnchere(Long utilisateurId) {
+        return historique_encheres.get(utilisateurId);
+    }
+
+    public List<String> getTypes() {
+        return types;
+    }
+
+    public void setTypes(List<String> types) {
+        this.types = types;
+    }
+
+    public Map<String, Integer> getStats() {
         return stats;
     }
 
-    public void setStats(Map<String, String> stats) {
+    public void setStats(Map<String, Integer> stats) {
         this.stats = stats;
     }
 
-    public void miseAjourHistory(Enchere e) {
-        History.add(e);
-    }
-    public List<Enchere> getHistory() {
-        return History;
-    }
 }

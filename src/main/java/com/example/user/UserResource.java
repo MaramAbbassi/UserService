@@ -204,4 +204,23 @@ public class UserResource {
     public Response getUserEncheres(@PathParam("userId") Long userId) {
         return Response.ok(userService.getUserEncheres(userId)).build();
     }
+
+    @POST
+    @Path("/{userId}/sell-pokemon/{pokemonId}")
+    @RolesAllowed({"User", "Admin"}) // Both Users and Admins can sell Pokémon
+    public Response sellPokemonToSystem(@PathParam("userId") Long userId, @PathParam("pokemonId") Long pokemonId) {
+        try {
+            String result = userService.sellPokemonToSystem(userId, pokemonId);
+            return Response.ok(result).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("An unexpected error occurred: " + e.getMessage())
+                    .build();
+        }
+    }
+
 }
