@@ -223,4 +223,19 @@ public class UserResource {
         }
     }
 
+    @GET
+    @Path("/top-limcoins")
+    @RolesAllowed("Admin") // Restrict access to Admins
+    public Response getTopUsersByLimCoins() {
+        try {
+            List<User> topUsers = userService.getTopUsersByLimCoins();
+            return Response.ok(topUsers).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("An unexpected error occurred: " + e.getMessage())
+                    .build();
+        }
+    }
+
+
 }

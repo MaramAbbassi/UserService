@@ -264,6 +264,13 @@ public class UserService {
         return "Pokémon sold successfully! Real value: " + pokemonRealValue + " LimCoins.";
     }
 
+    public List<User> getTopUsersByLimCoins() {
+        return em.createQuery("SELECT u FROM User u ORDER BY u.limCoins DESC", User.class)
+                .setMaxResults(5) // Limit the results to 5
+                .getResultList();
+    }
+
+
 
 
 }
