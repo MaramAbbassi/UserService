@@ -8,6 +8,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.mindrot.jbcrypt.BCrypt;
 import com.example.utils.JwtUtils;
 
@@ -21,6 +23,13 @@ public class UserService {
     @Inject
     EntityManager em;
 
+    @Inject
+    PokemonClient pokemonClient;
+
+    @Inject
+    EnchereClient enchereClient;
+
+
     public List<User> getAllUsers() {
         return em.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
@@ -30,6 +39,12 @@ public class UserService {
         if (user == null) {
             throw new UserNotFoundException("User with ID " + id + " not found.");
         }
+
+        List<Pokemon> pokemons = pokemonClient.getPokemonsByUserId(id);
+        List<Enchere> encheres = enchereClient.getEncheresByUserId(id);
+        user.setPokemons(pokemons);
+        user.setEncheres(encheres);
+
         return user;
     }
 
@@ -154,28 +169,26 @@ public class UserService {
     }
 
     @Transactional
-    public void addLimCoins(Long userId, int amount) {
+    public boolean addLimCoins(Long userId, int amount) {
         User user = findUserById(userId);
+        if (user == null) {
+            return false; // User not found
+        }
         user.setLimCoins(user.getLimCoins() + amount);
         em.merge(user);
+        return true; // Coins added successfully
     }
 
 
     @Transactional
-    public void deductLimCoins(Long userId, int amount) {
+    public boolean deductLimCoins(Long userId, int amount) {
         User user = findUserById(userId);
-        if (user.getLimCoins() < amount) {
-            throw new IllegalArgumentException("Insufficient LimCoins for user " + userId);
+        if (user == null || user.getLimCoins() < amount) {
+            return false; // User not found or insufficient coins
         }
         user.setLimCoins(user.getLimCoins() - amount);
         em.merge(user);
-    }
-
-    @Transactional
-    public void addPokemonToUser(Long userId, Long pokemonId) {
-        User user = findUserById(userId);
-        System.out.printf("Pokémon %d has been added to user %d%n", pokemonId, userId);
-        // Replace with actual implementation later.
+        return true; // Coins deducted successfully
     }
 
     private void checkForDuplicateUser(User user) {
@@ -198,6 +211,28 @@ public class UserService {
         if (emailCount > 0) {
             throw new IllegalArgumentException("Email already exists.");
         }
+    }
+
+    @Transactional
+    public void addPokemonToUser(Long userId, Pokemon pokemon) {
+        User user = findUserById(userId);
+        pokemonClient.addPokemonToUser(userId, pokemon); // Notify the Pokémon microservice
+        user.getPokemons().add(pokemon);
+    }
+
+    public List<Pokemon> getUserPokemons(Long userId) {
+        return findUserById(userId).getPokemons();
+    }
+
+    @Transactional
+    public void placeBid(Long userId, Enchere enchere) {
+        User user = findUserById(userId);
+        enchereClient.placeBid(userId, enchere); // Notify the Enchère microservice
+        user.getEncheres().add(enchere);
+    }
+
+    public List<Enchere> getUserEncheres(Long userId) {
+        return findUserById(userId).getEncheres();
     }
 
 

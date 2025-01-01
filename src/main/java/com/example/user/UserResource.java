@@ -141,15 +141,23 @@ public class UserResource {
         if (!user.getUsername().equals(authenticatedUsername) && !securityContext.isUserInRole("Admin")) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
-
+/*
         userService.addLimCoins(id, amount);
+        return Response.ok("Coins added successfully!").build();
+
+ */
+        if (!userService.addLimCoins(id, amount)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("User not found.")
+                    .build();
+        }
         return Response.ok("Coins added successfully!").build();
     }
 
     @POST
-    @Path("/{id}/spend-coins")
+    @Path("/{id}/deduct-coins")
     @RolesAllowed({"User", "Admin"}) // Both Users and Admins can spend coins
-    public Response spendLimCoins(@PathParam("id") Long id, @QueryParam("amount") int amount) {
+    public Response deductLimCoins(@PathParam("id") Long id, @QueryParam("amount") int amount) {
         String authenticatedUsername = securityContext.getUserPrincipal().getName();
 
         // Find the user
@@ -163,7 +171,37 @@ public class UserResource {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
 
-        userService.deductLimCoins(id, amount);
-        return Response.ok("Coins spent successfully!").build();
+        if (!userService.deductLimCoins(id, amount)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Insufficient LimCoins or User not found.")
+                    .build();
+        }
+        return Response.ok("Coins deducted successfully!").build();
+    }
+
+    @POST
+    @Path("/{userId}/add-pokemon")
+    public Response addPokemonToUser(@PathParam("userId") Long userId, Pokemon pokemon) {
+        userService.addPokemonToUser(userId, pokemon);
+        return Response.ok("Pokemon added successfully!").build();
+    }
+
+    @GET
+    @Path("/{userId}/pokemons")
+    public Response getUserPokemons(@PathParam("userId") Long userId) {
+        return Response.ok(userService.getUserPokemons(userId)).build();
+    }
+
+    @POST
+    @Path("/{userId}/place-bid")
+    public Response placeBid(@PathParam("userId") Long userId, Enchere enchere) {
+        userService.placeBid(userId, enchere);
+        return Response.ok("Bid placed successfully!").build();
+    }
+
+    @GET
+    @Path("/{userId}/bids")
+    public Response getUserEncheres(@PathParam("userId") Long userId) {
+        return Response.ok(userService.getUserEncheres(userId)).build();
     }
 }

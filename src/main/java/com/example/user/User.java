@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(columnNames = "username"),
@@ -33,7 +36,30 @@ public class User {
     @Column(nullable = false)
     private String role = "User";
 
+    @Transient
+    private List<Pokemon> pokemons = new ArrayList<>();
+
+    @Transient
+    private List<Enchere> encheres = new ArrayList<>();
+
     // Getter and Setter for role
+
+    public List<Pokemon> getPokemons() {
+        return pokemons;
+    }
+
+    public void setPokemons(List<Pokemon> pokemons) {
+        this.pokemons = pokemons;
+    }
+
+    public List<Enchere> getEncheres() {
+        return encheres;
+    }
+
+    public void setEncheres(List<Enchere> encheres) {
+        this.encheres = encheres;
+    }
+
     public String getRole() {
         return role;
     }

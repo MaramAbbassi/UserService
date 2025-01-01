@@ -15,6 +15,10 @@ dependencies {
     implementation 'io.quarkus:quarkus-arc'
     implementation 'io.quarkus:quarkus-resteasy'
     implementation 'io.quarkus:quarkus-resteasy-jsonb'
+    implementation 'io.quarkus:quarkus-resteasy-reactive-client'
+    implementation 'io.quarkus:quarkus-rest-client-jackson' // Optional for JSON parsing
+    implementation 'io.quarkus:quarkus-rest-client'
+
 
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
@@ -22,9 +26,6 @@ dependencies {
     implementation 'io.quarkus:quarkus-hibernate-orm'
     implementation 'io.quarkus:quarkus-jdbc-h2'
     runtimeOnly 'com.h2database:h2'
-
-
-
 
     implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
@@ -36,6 +37,7 @@ dependencies {
 
     implementation 'org.mindrot:jbcrypt:0.4'
     implementation 'io.quarkus:quarkus-smallrye-jwt'
+
 
 }
 
